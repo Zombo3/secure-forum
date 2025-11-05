@@ -42,6 +42,8 @@ app.set('views', path.join(__dirname, 'views'));
 app.use(express.urlencoded({ extended: false })); //parse from bodies
 app.use(cookieParser()); // read cookies into req.cookies
 
+app.use('/public', express.static(path.join(__dirname, 'public')));
+
 // Static files are served by Nginx at /static/, so this route just reminds us:
 app.get('/static/*', (req, res) => res.status(404).send('Static is served by Nginx container'));
 
