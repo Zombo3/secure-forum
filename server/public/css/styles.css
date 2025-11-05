@@ -1,4 +1,4 @@
-:root { --bg:#0b0e14; --fg:#e6e6e6; --muted:#96a0b5; --accent:#6ee7ff; --error:#ff6b6b; }
+/* :root { --bg:#0b0e14; --fg:#e6e6e6; --muted:#96a0b5; --accent:#6ee7ff; --error:#ff6b6b; }
 *{box-sizing:border-box} body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial,sans-serif;background:var(--bg);color:var(--fg)}
 .container{max-width:900px;margin:2rem auto;padding:0 1rem}
 .nav{display:flex;gap:1rem;align-items:center;padding:1rem;border-bottom:1px solid #222;background:#0f1320}
@@ -16,4 +16,249 @@ button{margin-top:.5rem;background:linear-gradient(90deg,#1e3a8a,#2563eb);border
 .comments{list-style:none;padding:0;display:grid;gap:1rem}
 .comment{padding:1rem;border:1px solid #1a2234;border-radius:12px;background:#0f1320}
 .meta{color:var(--muted);font-size:.9rem;margin-bottom:.5rem}
-.btn{display:inline-block;padding:.6rem 1rem;border-radius:10px;background:#2563eb;color:white;text-decoration:none}
+.btn{display:inline-block;padding:.6rem 1rem;border-radius:10px;background:#2563eb;color:white;text-decoration:none} */
+
+/* 💥 Zombo³ Alley — Max Loud Graffiti Theme (crisp titles + richer background) */
+
+@import url('https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Rubik+Glitch&family=Press+Start+2P&family=Bangers&family=Monoton&display=swap');
+
+/* Colors */
+:root{
+  --ink:#0b0b0f;
+  --brick:#1a1a25;
+  --hot-pink:#ff2bbf;
+  --acid:#00ff72;
+  --sun:#ffdf00;
+  --sky:#22ddff;
+  --violet:#7c2cff;
+  --paper:#f7f7f7;
+}
+
+/* Reset */
+*{margin:0;padding:0;box-sizing:border-box}
+
+/* Background: bold stripes + dots + moving neon haze */
+body{
+  min-height:100vh;
+  color:var(--paper);
+  background:
+    /* bright paint splats */
+    radial-gradient(circle at 12% 18%, rgba(255,43,191,.20) 0 18%, transparent 19%),
+    radial-gradient(circle at 80% 72%, rgba(34,221,255,.18) 0 16%, transparent 17%),
+    radial-gradient(circle at 42% 58%, rgba(255,223,0,.16) 0 14%, transparent 15%),
+    /* saturated diagonal stripes */
+    repeating-linear-gradient(135deg, rgba(124,44,255,.28) 0 16px, transparent 16px 32px),
+    /* deep base gradient */
+    linear-gradient(120deg, #0b0b0f 0%, #121220 40%, #17172a 100%);
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  overflow-x:hidden;
+  position: relative;
+}
+
+/* animated neon wash overlay */
+body::before{
+  content:"";
+  position: fixed;
+  inset: -20%;
+  z-index: -1;
+  background:
+    radial-gradient(60% 60% at 20% 30%, rgba(255,43,191,.18), transparent 60%),
+    radial-gradient(50% 50% at 80% 70%, rgba(34,221,255,.18), transparent 60%),
+    radial-gradient(40% 40% at 50% 50%, rgba(0,255,114,.14), transparent 60%),
+    conic-gradient(from 0deg, rgba(255,43,191,.18), rgba(255,223,0,.16), rgba(34,221,255,.18), rgba(124,44,255,.18), rgba(255,43,191,.18));
+  mix-blend-mode: screen;
+  filter: blur(30px);
+  animation: neonDrift 14s linear infinite alternate;
+}
+@keyframes neonDrift {
+  0%   { transform: translate(0,0) scale(1); }
+  100% { transform: translate(40px,30px) scale(1.05); }
+}
+
+/* Header banner: neon marquee */
+header{
+  padding:2.5rem 1rem 2rem;
+  text-align:center;
+  position:relative;
+  background:
+    linear-gradient(90deg, var(--hot-pink), var(--sun), var(--acid), var(--sky));
+  background-size:400% 100%;
+  animation:flow 8s ease-in-out infinite alternate;
+  box-shadow:0 12px 40px rgba(255,43,191,.25);
+}
+@keyframes flow{
+  to{ background-position:100% 0; }
+}
+
+/* CRISPER: title stroke + restrained glow */
+header h1{
+  font-family:'Monoton', cursive;
+  font-size:4.2rem;
+  line-height:1;
+  color:#fff;
+  letter-spacing:3px;
+  -webkit-text-stroke: 1px #000;
+  text-shadow:
+    0 0 2px #fff,
+    0 0 8px var(--hot-pink),
+    0 0 14px var(--sun);
+}
+
+header p.tagline{
+  margin-top:.6rem;
+  font-family:'Bangers', cursive;
+  font-size:1.3rem;
+  letter-spacing:2px;
+  color:#111;
+  text-shadow:0 2px 0 rgba(255,255,255,.5);
+}
+
+/* Nav: chunky chips */
+nav{
+  display:flex;
+  gap:.8rem;
+  justify-content:center;
+  flex-wrap:wrap;
+  padding:1rem .8rem;
+  background:linear-gradient(0deg, #0c0c12, #12131c);
+  border-bottom:3px dashed var(--hot-pink);
+}
+nav a{
+  font-family:'Bangers', cursive;
+  text-decoration:none;
+  font-size:1.05rem;
+  color:#111;
+  padding:.55rem 1rem;
+  border-radius:999px;
+  background:linear-gradient(90deg, var(--sun), var(--acid));
+  box-shadow:0 6px 0 #000, 0 0 18px rgba(255,223,0,.35);
+  transition:transform .15s ease, box-shadow .15s ease, filter .15s ease;
+}
+nav a:hover{
+  transform:translateY(-2px) rotate(-1deg) scale(1.05);
+  filter:saturate(1.4);
+  box-shadow:0 10px 0 #000, 0 0 24px rgba(34,221,255,.5);
+}
+
+/* Main card */
+main{
+  width:min(1000px, 92%);
+  margin:2rem auto 3rem;
+  background:rgba(18,18,28,.85);
+  border-radius:18px;
+  padding:2rem;
+  box-shadow:
+    0 12px 40px rgba(124,44,255,.25),
+    inset 0 0 0 3px rgba(255,255,255,.05);
+  position:relative;
+}
+main::after{
+  content:"";
+  position:absolute; inset:-4px;
+  border-radius:20px;
+  background:conic-gradient(from 180deg, var(--hot-pink), var(--sun), var(--acid), var(--sky), var(--violet), var(--hot-pink));
+  filter:blur(14px) opacity(.45);
+  z-index:-1;
+}
+
+/* CRISPER: section titles */
+main h2{
+  font-family:'Rubik Glitch', system-ui;
+  font-size:2rem;
+  color:var(--sun);
+  margin-bottom:1rem;
+  -webkit-text-stroke: 0.5px #000;
+  text-shadow: 0 0 3px rgba(255,223,0,.55);
+}
+main h3{
+  font-family:'Permanent Marker', cursive;
+  color:var(--sky);
+  margin:.8rem 0 .4rem;
+  -webkit-text-stroke: 0.4px #000;
+  text-shadow: 0 0 2px rgba(34,221,255,.5);
+}
+
+/* Buttons: arcade */
+button,.btn{
+  display:inline-block;
+  font-family:'Press Start 2P', monospace;
+  font-size:.85rem;
+  background:linear-gradient(90deg, var(--hot-pink), var(--violet));
+  color:#fff;
+  border:none;
+  padding:.9rem 1.2rem;
+  border-radius:14px;
+  box-shadow:0 6px 0 #000, 0 0 18px rgba(255,43,191,.35);
+  cursor:pointer;
+  transition:transform .12s ease, box-shadow .12s ease, filter .12s ease;
+}
+button:hover,.btn:hover{
+  transform:translateY(-2px) scale(1.03);
+  filter:saturate(1.4);
+}
+
+/* Comments: sticker cards */
+.comment{
+  background:linear-gradient(120deg, rgba(255,255,255,.10), rgba(255,255,255,.06));
+  border:3px solid #000;
+  border-radius:16px;
+  padding:1rem 1.1rem;
+  margin:1rem 0;
+  position:relative;
+  box-shadow:
+    0 10px 0 #000,
+    0 0 24px rgba(0,0,0,.35),
+    inset 0 0 0 2px rgba(255,255,255,.06);
+}
+.comment::before{
+  content:"";
+  position:absolute; top:-10px; left:-10px;
+  width:80px; height:80px; border-radius:50%;
+  background:radial-gradient(circle, rgba(255,43,191,.35), transparent 60%);
+  filter:blur(4px);
+}
+.comment strong{
+  display:inline-block;
+  font-family:'Permanent Marker', cursive;
+  color:var(--acid);
+  font-size:1.1rem;
+  margin-bottom:.35rem;
+  text-shadow:0 0 10px rgba(0,255,114,.5);
+}
+.comment .time{
+  font-size:.8rem;
+  color:#bbb;
+  opacity:.85;
+}
+.comment p{
+  line-height:1.6;
+}
+
+/* Forms */
+form label{
+  font-family:'Permanent Marker', cursive;
+  color:var(--sun);
+  display:block;
+  margin:.8rem 0 .3rem;
+}
+input, textarea{
+  width:100%;
+  padding:.8rem 1rem;
+  border-radius:12px;
+  border:2px solid #000;
+  background:#0f1018;
+  color:#fff;
+  box-shadow:inset 0 0 0 2px rgba(255,255,255,.06);
+}
+
+/* Footer */
+footer{
+  text-align:center;
+  padding:1.2rem;
+  background:#05050a;
+  border-top:4px dashed var(--hot-pink);
+  font-family:'Permanent Marker', cursive;
+  color:#cfcfcf;
+}
+footer a{ color:var(--sky); text-decoration:none }
+footer a:hover{ color:var(--sun); text-shadow:0 0 10px var(--sun) }
