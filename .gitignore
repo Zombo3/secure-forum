@@ -1,0 +1,11 @@
+# Node
+node_modules/
+
+# Environment
+.env
+
+# SQLite
+*.sqlite
+*.sqlite3
+server/db/*.db
+server/db/*.sqlite
