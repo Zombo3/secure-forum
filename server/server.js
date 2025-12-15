@@ -152,7 +152,8 @@ app.engine(
     layoutsDir: path.join(__dirname, 'views', 'layouts'),
     partialsDir: path.join(__dirname, 'views', 'partials'),
     helpers: {
-      formatDate: (d) => new Date(d).toLocaleString()
+      formatDate: (d) => new Date(d).toLocaleString(),
+      eq: (a, b) => a === b
     }
   })
 );
@@ -982,6 +983,35 @@ app.post('/comment', async (req, res) => {
     res.status(500).send('Server error');
   }
 });
+// Delete comment (POST) - only allow deleting your own comment
+app.post('/comment/:id/delete', async (req, res) => {
+  try {
+    const user = await getCurrentUser(req);
+    if (!user) {
+      return res
+        .status(401)
+        .render('login', { title: 'Login', error: 'Please log in to manage comments.' });
+    }
+
+    const commentId = parseInt(req.params.id, 10);
+    if (Number.isNaN(commentId)) return res.status(400).send('Invalid comment id');
+
+    const row = await dbGet(`SELECT user_id FROM comments WHERE id = ?`, [commentId]);
+    if (!row) return res.status(404).send('Comment not found');
+
+    if (row.user_id !== user.id) {
+      return res.status(403).send('You can only delete your own comments');
+    }
+
+    await dbRun(`DELETE FROM comments WHERE id = ?`, [commentId]);
+
+    res.redirect('/comments');
+  } catch (err) {
+    console.error('Delete comment error:', err);
+    res.status(500).send('Server error');
+  }
+});
+
 
 // Start server after DB init
 (async () => {

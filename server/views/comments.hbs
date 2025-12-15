@@ -7,15 +7,29 @@
 
 {{#if comments.length}}
   <ul>
-    {{#each comments}}
-      <li>
-        <strong>{{author}}</strong>
-        <span>({{formatDate createdAt}})</span>
-        <div>{{text}}</div>
-      </li>
-      <hr />
-    {{/each}}
-  </ul>
+  {{#each comments}}
+    <li>
+      <strong>{{author}}</strong>
+      <span>({{formatDate createdAt}})</span>
+
+      <div>{{text}}</div>
+
+      {{#if ../currentUser}}
+        {{#if (eq author ../currentUser.display_name)}}
+          <form
+            method="POST"
+            action="/comment/{{id}}/delete"
+            style="margin-top: 6px;"
+          >
+            <button type="submit">Delete</button>
+          </form>
+        {{/if}}
+      {{/if}}
+    </li>
+    <hr />
+  {{/each}}
+</ul>
+
 {{else}}
   <p>No comments yet.</p>
 {{/if}}
