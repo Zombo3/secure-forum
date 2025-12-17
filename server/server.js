@@ -710,7 +710,7 @@ app.post('/profile/password', requireAuth, async (req, res) => {
 // Comments feed (GET) -> SQLite + Pagination
 app.get('/comments', async (req, res) => {
   try {
-    const perPage = 20;
+    const perPage = 10;
 
     let page = parseInt(req.query.page || '1', 10);
     if (Number.isNaN(page) || page < 1) page = 1;
@@ -825,6 +825,79 @@ app.post('/comment', async (req, res) => {
     res.status(500).send('Server error');
   }
 });
+
+// Get recent chat history
+app.get('/api/chat/history', requireAuth, async (req, res) => {
+  try {
+    const HISTORY_LIMIT = 50;
+
+    const rows = await dbAll(
+      `
+      SELECT
+        u.display_name AS user,
+        u.name_color AS name_color,
+        u.avatar AS avatar,
+        cm.message AS text,
+        cm.created_at AS timestamp,
+        cm.room_id
+      FROM chat_messages cm
+      JOIN users u ON u.id = cm.user_id
+      WHERE cm.room_id = 1
+      ORDER BY cm.created_at DESC
+      LIMIT ?
+      `,
+      [HISTORY_LIMIT]
+    );
+
+    res.json({ ok: true, messages: rows.reverse() });
+  } catch (err) {
+    console.error('API chat history error:', err);
+    res.status(500).json({ ok: false, error: 'Server error' });
+  }
+});
+
+// Send a chat message
+app.post('/api/chat/send', requireAuth, async (req, res) => {
+  try {
+    const userId = res.locals.currentUser.id;
+    const text = String(req.body.text || '');
+
+    if (!text.trim()) {
+      return res.status(400).json({ ok: false, error: 'Message required' });
+    }
+
+    const userRow = await dbGet(
+      `SELECT display_name, name_color, avatar FROM users WHERE id = ? LIMIT 1`,
+      [userId]
+    );
+    if (!userRow) return res.status(404).json({ ok: false, error: 'User not found' });
+
+    const now = Date.now();
+
+    await dbRun(
+      `INSERT INTO chat_messages
+       (user_id, display_name, name_color, avatar, message, created_at, room_id)
+       VALUES (?, ?, ?, ?, ?, ?, ?)`,
+      [userId, userRow.display_name, userRow.name_color, userRow.avatar, text, now, 1]
+    );
+
+    // UI updates immediately for everyone
+    io.emit('chat:message', {
+      user: userRow.display_name,
+      name_color: userRow.name_color,
+      avatar: userRow.avatar,
+      text,
+      timestamp: now,
+      room_id: 1
+    });
+
+    res.json({ ok: true });
+  } catch (err) {
+    console.error('API chat send error:', err);
+    res.status(500).json({ ok: false, error: 'Server error' });
+  }
+});
+
 // Delete comment (POST) - only allow deleting your own comment
 app.post('/comment/:id/delete', async (req, res) => {
   try {

@@ -54,17 +54,21 @@
         .replaceAll("'", '&#039;');
     }
 
-    function addMsg(user, text, nameColor) {
+    function addMsg(user, text, nameColor, timestamp) {
       const div = document.createElement('div');
 
       const safeUser = escapeHtml(user);
       const safeText = escapeHtml(text);
 
+      const ts = typeof timestamp === 'number' ? new Date(timestamp) : null;
+      const timeStr = ts ? ts.toLocaleString() : '';
+
       if (nameColor) {
         div.innerHTML =
+          `<span style="opacity:0.7; margin-right:6px;">[${escapeHtml(timeStr)}]</span>` +
           `<strong style="color:${nameColor}">${safeUser}</strong>: ${safeText}`;
       } else {
-        div.textContent = `${user}: ${text}`;
+        div.textContent = `[${timeStr}] ${user}: ${text}`;
       }
 
       chatBox.appendChild(div);
@@ -78,7 +82,8 @@
         addMsg(
           msg.user,
           msg.message || msg.text,
-          msg.name_color
+          msg.name_color,
+          msg.timestamp
         );
       }
     });
@@ -88,7 +93,8 @@
       addMsg(
         msg.user,
         msg.message || msg.text,
-        msg.name_color
+        msg.name_color,
+        msg.timestamp
       );
     });
 
