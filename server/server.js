@@ -53,7 +53,7 @@ io.use(async (socket, next) => {
 
     if (!sess || sess.expires_at < now) return next(new Error('Authentication required'));
 
-    // Attach user info to socket (like socket.request.session in the textbook)
+    // Attach user info to socket 
     socket.user = {
       id: row.id,
       username: row.username,
@@ -71,7 +71,7 @@ io.use(async (socket, next) => {
 app.set('trust proxy', 1);
 
 // =====================
-// DB-backed sessions (required)
+// DB-backed sessions 
 // =====================
 const SESSION_TTL_MS = 1000 * 60 * 60; // 1 hour
 
@@ -132,7 +132,7 @@ async function getCurrentUser(req) {
   };
 }
 
-// Basic IP helper (works behind proxies if x-forwarded-for is set)
+// Basic IP helper 
 function getClientIp(req) {
   const xff = req.headers['x-forwarded-for'];
   if (typeof xff === 'string' && xff.length > 0) {
@@ -162,16 +162,15 @@ app.set('view engine', 'hbs');
 app.set('views', path.join(__dirname, 'views'));
 
 app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser()); // ✅ unsigned cookies (no extras)
+app.use(cookieParser()); // unsigned cookies
 
 app.use('/public', express.static(path.join(__dirname, 'public')));
 
-// Static files are served by Nginx at /static/, so this route just reminds us:
+// Static files are served by Nginx at /static/
 app.get('/static/*', (req, res) =>
   res.status(404).send('Static is served by Nginx container')
 );
 
-// Make currentUser available to templates (DB-backed)
 // Make currentUser available to templates (DB-backed)
 app.use(async (req, res, next) => {
   try {
@@ -502,7 +501,7 @@ app.post('/login', async (req, res) => {
       [now, userRow.id]
     );
 
-    // Create DB session (required)
+    // Create DB session 
     const sessionId = uuidv4();
     const expiresAtMs = now + SESSION_TTL_MS;
 
