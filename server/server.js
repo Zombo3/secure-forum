@@ -360,7 +360,7 @@ app.post('/register', async (req, res) => {
         error: 'Username already taken.'
       });
     }
-
+    // Ensure email uniqueness to prevent duplicate accounts and impersonation
     const existingEmail = await dbGet('SELECT id FROM users WHERE email = ?', [email]);
     if (existingEmail) {
       return res.status(400).render('register', {
@@ -368,8 +368,10 @@ app.post('/register', async (req, res) => {
         error: 'Email already in use.'
       });
     }
-
+    // Hash the user's password using Argon2 to avoid storing plaintext passwords
+    // and to protect against brute-force and rainbow table attacks
     const password_hash = await argon2.hash(password);
+    // Store timestamps for auditing and future security checks
     const now = Date.now();
 
     await dbRun(
@@ -424,13 +426,16 @@ app.post('/login', async (req, res) => {
          VALUES (?, ?, ?, ?)`,
         [username, ip, now, 0]
       );
+      const lockedUntil = userRow.locked_until;
+      const remainingMs = lockedUntil - now;
+      const remainingMin = Math.max(1, Math.ceil(remainingMs / 60000));
 
-      const unlockAt = new Date(userRow.locked_until).toLocaleString();
       return res.status(403).render('login', {
         title: 'Login',
-        error: `Account locked due to failed attempts. Try again at ${unlockAt}.`
+        error: `Account locked due to failed attempts. Try again in ${remainingMin} minute(s).`
       });
     }
+
 
     if (!userRow) {
       await dbRun(
@@ -444,21 +449,25 @@ app.post('/login', async (req, res) => {
         error: 'Invalid username or password.'
       });
     }
-
+    
+    // Verify the plaintext password against the stored Argon2 hash (never store plaintext)
     const ok = await argon2.verify(userRow.password_hash, password);
 
     if (!ok) {
+      // Record failed login attempts for auditing / intrusion detection
       await dbRun(
         `INSERT INTO login_attempts (username, ip, ts, success)
          VALUES (?, ?, ?, ?)`,
         [username, ip, now, 0]
       );
-
+      // Increment per-user failed attempt counter to enforce lockout
       const newAttempts = (userRow.failed_attempts || 0) + 1;
+      
       const MAX_ATTEMPTS = 5;
       const LOCK_MINUTES = 15;
 
       if (newAttempts >= MAX_ATTEMPTS) {
+        // Temporarily lock the account after too many failed attempts to slow guessing attacks
         const lockedUntil = now + LOCK_MINUTES * 60 * 1000;
 
         await dbRun(
@@ -624,19 +633,21 @@ app.post('/profile/customize', requireAuth, async (req, res) => {
 
 // Change email (verify password + validate + unique)
 app.post('/profile/email', requireAuth, async (req, res) => {
+  // Use authenticated user ID from the server-side session
   const userId = res.locals.currentUser.id;
+  // Normalize email input to enforce consistent uniqueness checks
   const email = normalizeEmail(req.body.email);
   const password = String(req.body.password || '');
-
+  // Validate email format to prevent malformed or unsafe input
   if (!isValidEmail(email)) {
     return res.status(400).send('Invalid email format');
   }
-
+  // Fetch the stored password hash for re-authentication
   const userRow = await dbGet(`SELECT password_hash FROM users WHERE id = ?`, [
     userId
   ]);
   if (!userRow) return res.status(404).send('User not found');
-
+  // Require current password confirmation before changing sensitive account data
   const ok = await argon2.verify(userRow.password_hash, password);
   if (!ok) return res.status(403).send('Password incorrect');
 
@@ -658,30 +669,33 @@ app.post('/profile/email', requireAuth, async (req, res) => {
 
 // Change password (verify current password + strength + invalidate sessions)
 app.post('/profile/password', requireAuth, async (req, res) => {
+  // Use authenticated user identity from server-side session
   const userId = res.locals.currentUser.id;
   const current_password = String(req.body.current_password || '');
   const new_password = String(req.body.new_password || '');
   const confirm_password = String(req.body.confirm_password || '');
-
+   
+  // Prevent accidental changes / typos
   if (!new_password || new_password !== confirm_password) {
     return res.status(400).send('New passwords do not match');
   }
-
+  
+  // Enforce strong passwords
   if (!isStrongPassword(new_password)) {
     return res.status(400).send(
       'Password must be at least 8 chars and include upper, lower, number, and symbol'
     );
   }
-
+  // Fetch stored Argon2 hash to verify the current password
   const row = await dbGet(
     `SELECT password_hash FROM users WHERE id = ?`,
     [userId]
   );
   if (!row) return res.status(404).send('User not found');
-
+  // Require re-authentication before changing credentials
   const ok = await argon2.verify(row.password_hash, current_password);
   if (!ok) return res.status(403).send('Current password incorrect');
-
+  // Hash the new password (never store plaintext)
   const newHash = await argon2.hash(new_password);
   const now = Date.now();
 

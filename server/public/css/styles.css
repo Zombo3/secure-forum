@@ -162,11 +162,11 @@ main h3{
 button,.btn{
   display:inline-block;
   font-family:'Press Start 2P', monospace;
-  font-size:.85rem;
+  font-size:.75rem;
   background:linear-gradient(90deg, var(--hot-pink), var(--violet));
   color:#fff;
   border:none;
-  padding:.9rem 1.2rem;
+  padding:.55rem .9rem;
   border-radius:14px;
   box-shadow:0 6px 0 #000, 0 0 18px rgba(255,43,191,.35);
   cursor:pointer;
