@@ -16,7 +16,7 @@ Deployed behind Nginx Proxy Manager with HTTPS (Let’s Encrypt).
 
 ### 1) Clone & Install
 ```bash
-git clone https://github.com/Zombo3/insecure-forum.git
+git clone https://github.com/Zombo3/secure-forum.git
 cd insecure-forum/server
 npm install
 ```
