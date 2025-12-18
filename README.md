@@ -122,6 +122,7 @@ insecure-forum/
         ├── login.hbs
         ├── register.hbs
         └── profile.hbs
+```
 
 ## Routes
 
@@ -239,7 +240,7 @@ sqlite3 db/forum.sqlite
 .tables
 .schema table_name
 .exit
-
+```
 ## Database Schema Documentation
 
 ### `users`
